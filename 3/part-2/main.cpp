@@ -35,6 +35,7 @@ int main() {
     }
     inputfile.close();
 
+    //Count trees
     int count[5];
     long prod = 1;
 
