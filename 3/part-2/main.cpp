@@ -50,7 +50,7 @@ int main() {
         prod *= i;
     }
 
-    cout << endl << "Multiplied together the number of trees encounter " << prod << endl;
+    cout << endl << "Multiplied together the number of trees encounter " << prod << "." << endl;
     
     return 0;
 }
