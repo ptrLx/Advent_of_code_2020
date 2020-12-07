@@ -5,59 +5,107 @@
 
 using namespace std;
 
-class answer {
+class bag {
    public:
-    string answerstring;
-    bool flagEmpty; //addLine -> Don't add line when somthing was already written to answerstring and has been reset
+    string color;
+    vector<pair<string, int>> contain;
+    vector<pair<bag *, int>> containPointer;
+    vector<pair<bag *, int>> containedByPointer;
 
-    answer() : answerstring(""), flagEmpty(true) {}
+    bool containGold;
 
-    void addLine(const string &line) {
-        if(answerstring == "") {
-            if (flagEmpty) {
-                answerstring = line;
-                flagEmpty = false;
-            }
-        } else {
-            string newAnswerstring = "";
-            for (char c : line) {
-                if (answerstring.find(c) != string::npos) {
-                    newAnswerstring += c;
-                }
-            }
-            answerstring = newAnswerstring;
+    bag() : color(""), containGold(false) {}
+
+    void addContain(string name, int count) {
+        contain.push_back(make_pair(name, count));
+    }
+
+    int findContainedByBags() {
+        if (containGold) return 0;
+        containGold = true;
+        int count = 1;
+        for (auto &cBy : containedByPointer) {
+            count += cBy.first->findContainedByBags();
         }
+        return count;
     }
 
-    void clear() {
-        answerstring = "";
-        flagEmpty = true;
+    int findContainedBags() {
+        int count = 0;
+        for(auto c : containPointer) {
+            count += c.second * (1+c.first->findContainedBags());
+        }
+        return count;
     }
 
-    ~answer() {}
+    ~bag() {}
 };
 
 int main() {
-    vector<answer> answers;
-    int sum = 0;
+    vector<bag> bags;
     fstream inputfile;
     inputfile.open("inputfile", ios::in);
     if (!inputfile) {
         cout << "No such file" << endl;
     } else {
-        answer current;
         for (string line; getline(inputfile, line);) {
-            if (line == "") {
-                answers.push_back(current);
-                sum += current.answerstring.size();
-                current.clear();
-            } else {
-                current.addLine(line);
+            bag newBag;
+            string name;
+            int count, pos;
+
+            pos = line.find(" bags contain ");
+            newBag.color = line.substr(0, pos);
+
+            line = line.substr(pos + 14, line.size());
+
+            while (true) {
+                try {
+                    count = stoi(line.substr(0, 1));
+                } catch (const std::invalid_argument &e) {
+                    break;
+                }
+
+                line = line.substr(2, line.size());
+
+                pos = line.find(" bag");
+                name = line.substr(0, pos);
+
+                newBag.addContain(name, count);
+                pos += 4;
+
+                if (line[pos] == 's')
+
+                    pos++;
+                if (line[pos] == '.')
+
+                    break;
+                else
+                    line = line.substr(pos + 2, line.size());
             }
+
+            bags.push_back(newBag);
         }
     }
     inputfile.close();
 
-    cout << "The sum of counts is " << sum << "." << endl;
+    for (auto &bag : bags) {
+        for (auto &containdeBag : bag.contain) {
+            for (auto &bagsearch : bags) {
+                if (containdeBag.first == bagsearch.color) {
+                    bag.containPointer.push_back({&bagsearch, containdeBag.second});
+                    bagsearch.containedByPointer.push_back({&bag, containdeBag.second});
+                    break;
+                }
+            }
+        }
+    }
+
+    for (auto &goldBag : bags) {
+        if (goldBag.color == "shiny gold") {
+            cout << "Shiny gold is contains " << goldBag.findContainedBags() << " bags." << endl;
+            break;
+        }
+    }
+
     return 0;
 }
