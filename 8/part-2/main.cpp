@@ -59,7 +59,7 @@ int main() {
             continue;
         
         //Simulate
-        int pc, acc = 0;
+        int pc = 0, acc = 0;
         while (pc < 646 && !instructions[pc].executedOnce) {
             instructions[pc].executedOnce = true;
             switch (instructions[pc].op) {
@@ -80,14 +80,12 @@ int main() {
             instructions[i].op = operation::nop;
         else if (instructions[i].op == operation::nop)
             instructions[i].op = operation::jmp;
-        for(auto inst : instructions)
-            instructions[pc].executedOnce = false;
+        for(auto &instr : instructions)
+            instr.executedOnce = false;
 
-        // cout << "Modified " << i << ", pc " << pc << endl;
-
-        if (pc > 645) {
-            cout << "Success when changing instruction " << i << "." << endl;
-            break;
+        if (pc == 646) {
+            cout << "Success when changing instruction " << i << ". Program returned " << acc << "." << endl;
+            //break;
         }
     }
 
