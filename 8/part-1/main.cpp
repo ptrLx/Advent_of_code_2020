@@ -48,7 +48,7 @@ int main() {
     inputfile.close();
 
     //Simulator
-    int pc, acc = 0;
+    int pc = 0, acc = 0;
     while (!instructions[pc].executedOnce) {
         instructions[pc].executedOnce = true;
         switch (instructions[pc].op) {
